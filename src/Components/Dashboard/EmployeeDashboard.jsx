@@ -12,23 +12,25 @@ export const EmployeeDashboard = ({userInfo}) => {
 
         {/* Tasks */}
         <div className='grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-5 mt-10'>
-            <div className=' bg-red-400 rounded-md p-8'>
-                <h2 className='text-3xl font-semibold text-white'>0</h2>
-                <h3 className='text-xl font-medium text-white'>New Task</h3>               
+            <div className='bg-emerald-400 rounded-md p-8'>
+                <h2 className='text-3xl font-semibold text-white'>{userInfo.CountTask.newTaskCount}</h2>
+                <h3 className='text-xl font-medium text-white'>New Task</h3>
             </div>
-            <div className=' bg-red-400 rounded-md p-8'>
-                <h2 className='text-3xl font-semibold text-white'>0</h2>
-                <h3 className='text-xl font-medium text-white'>New Task</h3>               
+            <div className='bg-blue-400 rounded-md p-8'>
+                <h2 className='text-3xl font-semibold text-white'>{userInfo.CountTask.activeTaskCount}</h2>
+                <h3 className='text-xl font-medium text-white'>Active Tasks</h3>
             </div>
-            <div className=' bg-red-400 rounded-md p-8'>
-                <h2 className='text-3xl font-semibold text-white'>0</h2>
-                <h3 className='text-xl font-medium text-white'>New Task</h3>               
+            <div className='bg-green-400 rounded-md p-8'>
+                <h2 className='text-3xl font-semibold text-white'>{userInfo.CountTask.completedTaskCount}</h2>
+                <h3 className='text-xl font-medium text-white'>Completed Tasks</h3>
             </div>
-            <div className=' bg-red-400 rounded-md p-8'>
-                <h2 className='text-3xl font-semibold text-white'>0</h2>
-                <h3 className='text-xl font-medium text-white'>New Task</h3>               
+            <div className='bg-red-500 rounded-md p-8'>
+                <h2 className='text-3xl font-semibold text-white'>{userInfo.CountTask.failedTaskCount}</h2>
+                <h3 className='text-xl font-medium text-white'>Failed Tasks</h3>
             </div>
         </div>
+
+
 
 
         <h2 className='text-2xl text-white text-center font-semibold mt-10'>New Tasks</h2>
