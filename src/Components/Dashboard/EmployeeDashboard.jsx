@@ -1,13 +1,22 @@
 import React from 'react'
+import Login from '../Auth/Login';
 
 export const EmployeeDashboard = ({userInfo}) => {
-    console.log(userInfo)
+    // console.log(userInfo)
+
+    const handleLogout = () => {
+        localStorage.removeItem('loggedInUser');
+        window.location.reload()
+        
+    }
+
+
     
   return (
     <div className='bg-[#1C1C1C] h-screen p-10'>
         <div className='flex items-end justify-between'>
             <h1 className='text-2xl text-white'>Hello, <br /> <span className='font-semibold text-3xl'>{userInfo.firstName}</span> 👋</h1>
-            <button className='text-white text-xl px-6 py-2 bg-red-600 rounded-md'>Logout</button>
+            <button onClick={handleLogout} className='text-white text-xl px-6 py-2 bg-red-600 rounded-md'>Logout</button>
         </div>
 
         {/* Tasks */}
