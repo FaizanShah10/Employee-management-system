@@ -1,13 +1,18 @@
 import React from 'react';
 
 const AdminDashboard = () => {
+
+  const handleLogout = () => {
+    localStorage.setItem('loggedInUser', '');
+    window.location.reload();
+};
+
   return (
     <div className='bg-[#1C1C1C] h-auto p-10'>
-      
-      
+
       <div className='flex items-center justify-between mb-8'>
         <h1 className='text-2xl text-white'>Hello, <br /> <span className='font-semibold text-3xl'>Faizan</span> 👋</h1>
-        <button className='bg-red-600 text-white px-6 py-2 rounded-md text-xl'>
+        <button onClick={handleLogout} className='bg-red-600 text-white px-6 py-2 rounded-md text-xl'>
           Logout
         </button>
       </div>

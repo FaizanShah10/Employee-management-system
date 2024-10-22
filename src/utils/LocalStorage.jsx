@@ -1,4 +1,3 @@
-
 const employees = [
   {
     employeeId: "emp001",
@@ -12,10 +11,7 @@ const employees = [
         description: "Revise the homepage content based on the new marketing guidelines.",
         date: "2024-10-15",
         category: "Content Update",
-        activeTask: true,
-        newTask: true,
-        completedTask: false,
-        failedTask: false
+        status: "new" 
       },
       {
         taskId: "task102",
@@ -23,10 +19,7 @@ const employees = [
         description: "Identify and fix bugs on the landing page reported by the QA team.",
         date: "2024-10-10",
         category: "Bug Fixing",
-        activeTask: false,
-        newTask: false,
-        completedTask: true,
-        failedTask: false
+        status: "completed"
       }
     ],
     CountTask: {
@@ -48,10 +41,7 @@ const employees = [
         description: "Compile and prepare the sales report for the month of September.",
         date: "2024-10-01",
         category: "Report",
-        activeTask: false,
-        newTask: false,
-        completedTask: true,
-        failedTask: false
+        status: "completed"
       },
       {
         taskId: "task104",
@@ -59,10 +49,7 @@ const employees = [
         description: "Arrange a meeting with the marketing and sales teams to discuss the upcoming product launch.",
         date: "2024-10-12",
         category: "Meeting",
-        activeTask: true,
-        newTask: true,
-        completedTask: false,
-        failedTask: false
+        status: "active"
       }
     ],
     CountTask: {
@@ -84,10 +71,7 @@ const employees = [
         description: "Prepare and deliver a presentation for the new client onboarding process.",
         date: "2024-10-05",
         category: "Presentation",
-        activeTask: false,
-        newTask: false,
-        completedTask: false,
-        failedTask: true
+        status: "failed"
       },
       {
         taskId: "task106",
@@ -95,10 +79,7 @@ const employees = [
         description: "Research and provide insights on the latest market trends in the technology sector.",
         date: "2024-10-20",
         category: "Research",
-        activeTask: true,
-        newTask: true,
-        completedTask: false,
-        failedTask: false
+        status: "new"
       }
     ],
     CountTask: {
@@ -108,32 +89,26 @@ const employees = [
       failedTaskCount: 1
     }
   }
-]
-
+];
 
 const admin = [
   {
-    "id": "admin001",
-    "firstName": "Admin",    // Added firstName property
-    "email": "admin@company.com",
-    "password": "adminpassword123"
+    id: "admin001",
+    firstName: "Admin",
+    email: "admin@company.com",
+    password: "adminpassword123"
   }
-]
+];
 
-  
-  
-
+// Function to set localStorage data
 export const setLocalStorage = () => {
-    localStorage.setItem('admin', JSON.stringify(admin))
-    localStorage.setItem('employee', JSON.stringify(employees))
-}
-
-
-export const getLocalStorage = () => {
-  const adminData = JSON.parse(localStorage.getItem('admin')) || [];  // Ensure fallback to empty array
-  const employeeData = JSON.parse(localStorage.getItem('employee')) || [];  // Ensure fallback to empty array
-
-  return { adminData, employeeData };
+    localStorage.setItem('admin', JSON.stringify(admin));
+    localStorage.setItem('employee', JSON.stringify(employees));
 };
 
-
+// Function to get localStorage data
+export const getLocalStorage = () => {
+  const adminData = JSON.parse(localStorage.getItem('admin')) || [];
+  const employeeData = JSON.parse(localStorage.getItem('employee')) || [];
+  return { adminData, employeeData };
+};

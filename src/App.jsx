@@ -9,6 +9,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [loggedInUserInfo, setLoggedInUserInfo] = useState(null);
   const authData = useContext(AuthContext);
+  console.log(authData)
 
 
 
