@@ -1,6 +1,6 @@
 const employees = [
   {
-    employeeId: "emp001",
+    employeeId: "1",
     firstName: "John",
     email: "john.doe@company.com",
     password: "password123",
@@ -30,7 +30,7 @@ const employees = [
     }
   },
   {
-    employeeId: "emp002",
+    employeeId: "2",
     firstName: "Jane",
     email: "jane.smith@company.com",
     password: "password456",
@@ -60,7 +60,7 @@ const employees = [
     }
   },
   {
-    employeeId: "emp003",
+    employeeId: "3",
     firstName: "Michael",
     email: "michael.williams@company.com",
     password: "password789",

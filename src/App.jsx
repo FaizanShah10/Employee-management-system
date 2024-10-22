@@ -9,7 +9,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [loggedInUserInfo, setLoggedInUserInfo] = useState(null);
   const authData = useContext(AuthContext);
-  console.log(authData)
+  // console.log(authData)
 
 
 
@@ -50,7 +50,7 @@ const App = () => {
       {!user ? (
         <Login handleLogin={handleLogin} />
       ) : user === 'admin' ? (
-        <AdminDashboard />
+        <AdminDashboard userInfo={loggedInUserInfo}/>
       ) : (
         <EmployeeDashboard userInfo={loggedInUserInfo} />
       )}

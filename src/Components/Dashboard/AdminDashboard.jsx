@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
+import { AuthContext } from '../Context/AuthProvider';
+import { setLocalStorage } from '../../utils/LocalStorage';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({userInfo}) => {
+  // console.log(userInfo)
+
+  const authData = useContext(AuthContext)
+  // console.log(authData.employeeData)
+
+  
 
   const handleLogout = () => {
     localStorage.setItem('loggedInUser', '');
@@ -11,7 +19,7 @@ const AdminDashboard = () => {
     <div className='bg-[#1C1C1C] h-auto p-10'>
 
       <div className='flex items-center justify-between mb-8'>
-        <h1 className='text-2xl text-white'>Hello, <br /> <span className='font-semibold text-3xl'>Faizan</span> 👋</h1>
+        <h1 className='text-2xl text-white'>Hello, <br /> <span className='font-semibold text-3xl'>{userInfo.firstName}</span> 👋</h1>
         <button onClick={handleLogout} className='bg-red-600 text-white px-6 py-2 rounded-md text-xl'>
           Logout
         </button>
@@ -130,6 +138,65 @@ const AdminDashboard = () => {
             
         
         </div>
+
+
+        {/* Employees Data */}
+        <h2 className='text-2xl text-white text-center font-semibold mt-10'>Employees Information</h2>
+        {/* Employees List */}   
+        <div class="mx-auto max-w-screen-lg px-4 py-8 sm:px-8">
+          
+          <div class="overflow-y-hidden rounded-lg border">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-emerald-600 text-left text-xs font-semibold uppercase tracking-widest text-white">
+                    <th class="px-5 py-3">ID</th>
+                    <th class="px-5 py-3">Full Name</th>
+                    <th class="px-5 py-3">New Task</th>
+                    <th class="px-5 py-3">Completed Task</th>
+                    <th class="px-5 py-3">Active Task</th>
+                    <th class="px-5 py-3">Failed Task</th>
+                  </tr>
+                </thead>
+                {authData.employeeData.map((employee) => (
+                    <tbody class="text-gray-500">
+                    <tr>
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <p class="whitespace-no-wrap text-white">{employee.employeeId}</p>
+                      </td>
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <div class="flex items-center">
+                          
+                          <div class="ml-3">
+                            <p class="whitespace-no-wrap text-white">{employee.firstName}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <p class="whitespace-no-wrap text-white">{employee.CountTask.newTaskCount}</p>
+                      </td>
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <p class="whitespace-no-wrap text-white">{employee.CountTask.completedTaskCount}</p>
+                      </td>
+  
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <p class="whitespace-no-wrap text-white">{employee.CountTask.activeTaskCount}</p>
+                      </td>
+  
+                      <td class="border-b border-gray-200 bg-transparent px-5 py-5 text-sm">
+                        <p class="whitespace-no-wrap text-white">{employee.CountTask.failedTaskCount}</p>
+                      </td>
+                    </tr>
+                    
+                  </tbody>
+                ))}
+              </table>
+            </div>
+            
+          </div>
+        </div>
+
+
     </div>
   );
 };
