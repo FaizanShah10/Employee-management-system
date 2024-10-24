@@ -8,23 +8,25 @@ const employees = [
       {
         taskId: "task101",
         taskTitle: "Update Website Content",
-        description: "Revise the homepage content based on the new marketing guidelines.",
-        date: "2024-10-15",
-        category: "Content Update",
-        status: "new" 
+        taskDescription: "Revise the homepage content based on the new marketing guidelines.",
+        taskCategory: "Content Update",
+        taskDate: "2024-10-15",
+        assignTo: "John",
+        status: "new"
       },
       {
         taskId: "task102",
         taskTitle: "Fix Landing Page Bugs",
-        description: "Identify and fix bugs on the landing page reported by the QA team.",
-        date: "2024-10-10",
-        category: "Bug Fixing",
+        taskDescription: "Identify and fix bugs on the landing page reported by the QA team.",
+        taskCategory: "Bug Fixing",
+        taskDate: "2024-10-10",
+        assignTo: "John",
         status: "completed"
       }
     ],
     CountTask: {
       newTaskCount: 1,
-      activeTaskCount: 1,
+      activeTaskCount: 0,
       completedTaskCount: 1,
       failedTaskCount: 0
     }
@@ -38,22 +40,24 @@ const employees = [
       {
         taskId: "task103",
         taskTitle: "Prepare Monthly Sales Report",
-        description: "Compile and prepare the sales report for the month of September.",
-        date: "2024-10-01",
-        category: "Report",
+        taskDescription: "Compile and prepare the sales report for the month of September.",
+        taskCategory: "Report",
+        taskDate: "2024-10-01",
+        assignTo: "Jane",
         status: "completed"
       },
       {
         taskId: "task104",
         taskTitle: "Organize Team Meeting",
-        description: "Arrange a meeting with the marketing and sales teams to discuss the upcoming product launch.",
-        date: "2024-10-12",
-        category: "Meeting",
+        taskDescription: "Arrange a meeting with the marketing and sales teams to discuss the upcoming product launch.",
+        taskCategory: "Meeting",
+        taskDate: "2024-10-12",
+        assignTo: "Jane",
         status: "active"
       }
     ],
     CountTask: {
-      newTaskCount: 1,
+      newTaskCount: 0,
       activeTaskCount: 1,
       completedTaskCount: 1,
       failedTaskCount: 0
@@ -68,28 +72,32 @@ const employees = [
       {
         taskId: "task105",
         taskTitle: "Client Presentation",
-        description: "Prepare and deliver a presentation for the new client onboarding process.",
-        date: "2024-10-05",
-        category: "Presentation",
+        taskDescription: "Prepare and deliver a presentation for the new client onboarding process.",
+        taskCategory: "Presentation",
+        taskDate: "2024-10-05",
+        assignTo: "Michael",
         status: "failed"
       },
       {
         taskId: "task106",
         taskTitle: "Research Market Trends",
-        description: "Research and provide insights on the latest market trends in the technology sector.",
-        date: "2024-10-20",
-        category: "Research",
+        taskDescription: "Research and provide insights on the latest market trends in the technology sector.",
+        taskCategory: "Research",
+        taskDate: "2024-10-20",
+        assignTo: "Michael",
         status: "new"
       }
     ],
     CountTask: {
       newTaskCount: 1,
-      activeTaskCount: 1,
+      activeTaskCount: 0,
       completedTaskCount: 0,
       failedTaskCount: 1
     }
   }
 ];
+
+
 
 const admin = [
   {

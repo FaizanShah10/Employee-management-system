@@ -5,7 +5,6 @@ import { setLocalStorage } from '../../utils/LocalStorage';
 const AdminDashboard = ({userInfo}) => {
 
   const authData = useContext(AuthContext)
-  // console.log(authData)
 
 
   const [taskTitle, settaskTitle] = useState('')
@@ -15,13 +14,22 @@ const AdminDashboard = ({userInfo}) => {
   const [taskCategory, settaskCategory] = useState('')
 
   
-
+  const generateRandomId = () => {
+    return `task_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  };
   
   const handleSubmit = (e) => {
     e.preventDefault();
 
     // Define the new task
-    const newTask = { taskTitle, taskDescription, taskDate, assignTo, taskCategory, status: "new" };
+    const newTask = { 
+      taskId: generateRandomId(),
+      taskTitle, 
+      taskDescription, 
+      taskDate, 
+      assignTo, 
+      taskCategory, 
+      status: 'new' };
 
     // Fetch employee data from localStorage
     const employeeData = JSON.parse(localStorage.getItem('employee'));
@@ -33,6 +41,7 @@ const AdminDashboard = ({userInfo}) => {
                     employee.tasks = []; // Initialize tasks array if it doesn't exist
                 }
                 employee.tasks.push(newTask);
+                employee.taskCount.newCountTask = employee.taskCount.newCountTask+1
             }
         });
         localStorage.setItem('employee', JSON.stringify(employeeData));

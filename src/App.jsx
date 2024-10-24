@@ -11,7 +11,7 @@ const App = () => {
   const authData = useContext(AuthContext);
   // console.log(authData)
 
-
+  
 
   useEffect(() => {
     const storedUser = localStorage.getItem('loggedInUser');
