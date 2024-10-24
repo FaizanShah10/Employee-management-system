@@ -96,7 +96,8 @@ const admin = [
     id: "admin001",
     firstName: "Admin",
     email: "admin@company.com",
-    password: "adminpassword123"
+    password: "adminpassword123",
+    tasks: []
   }
 ];
 
