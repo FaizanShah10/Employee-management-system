@@ -21,7 +21,7 @@ const AdminDashboard = ({userInfo}) => {
     e.preventDefault();
 
     // Define the new task
-    const newTask = { taskTitle, taskDescription, taskDate, assignTo, taskCategory };
+    const newTask = { taskTitle, taskDescription, taskDate, assignTo, taskCategory, status: "new" };
 
     // Fetch employee data from localStorage
     const employeeData = JSON.parse(localStorage.getItem('employee'));
