@@ -4,6 +4,7 @@ import { EmployeeDashboard } from './Components/Dashboard/EmployeeDashboard';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import { AuthContext } from './Components/Context/AuthProvider';
 import { getLocalStorage, setLocalStorage } from './utils/LocalStorage';
+import Signup from './Components/Auth/Signup';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -47,13 +48,7 @@ const App = () => {
 
   return (
     <div>
-      {!user ? (
-        <Login handleLogin={handleLogin} />
-      ) : user === 'admin' ? (
-        <AdminDashboard userInfo={loggedInUserInfo}/>
-      ) : (
-        <EmployeeDashboard userInfo={loggedInUserInfo} />
-      )}
+      <Signup/>
     </div>
   );
 };

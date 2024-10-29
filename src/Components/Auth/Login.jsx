@@ -12,7 +12,8 @@ const Login = (props) => {
   }
 
   return (
-    <div className='flex w-screen h-screen bg-zinc-900 justify-center items-center'>
+    <div className='flex flex-col w-screen h-screen bg-zinc-900 justify-center items-center'>
+      <h2 className='font-semibold text-white text-3xl m-2 font-[Gilroy-Medium]'>Signup</h2>
       <form onSubmit={handleSubmit(handleLogin)} className='flex flex-col lg:w-1/4 md:w-1/2 sm:w-1/2 gap-4 border-2 border-emerald-600 rounded-lg px-4 py-10'>
         <input
           className='px-5 py-2 border-2 border-emerald-600 text-white text-sm rounded-full w-full bg-transparent outline-none'

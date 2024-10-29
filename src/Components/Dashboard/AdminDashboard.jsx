@@ -5,6 +5,8 @@ import { setLocalStorage } from '../../utils/LocalStorage';
 const AdminDashboard = ({userInfo}) => {
 
   const authData = useContext(AuthContext)
+  // console.log(authData?.adminData)
+
 
 
   const [taskTitle, settaskTitle] = useState('')
@@ -17,7 +19,8 @@ const AdminDashboard = ({userInfo}) => {
   const generateRandomId = () => {
     return `task_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   };
-  
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -34,14 +37,14 @@ const AdminDashboard = ({userInfo}) => {
     // Fetch employee data from localStorage
     const employeeData = JSON.parse(localStorage.getItem('employee'));
     if (employeeData) {
-        // Assign task to the employee based on `assignTo`
+        // Assign task to the employee based on assignTo
         employeeData.forEach((employee) => {
             if (assignTo === employee.firstName) {
                 if (!employee.tasks) {
                     employee.tasks = []; // Initialize tasks array if it doesn't exist
                 }
                 employee.tasks.push(newTask);
-                employee.taskCount.newCountTask = employee.taskCount.newCountTask+1
+                employee.CountTask.newCountTask = employee.CountTask.newCountTask+1
             }
         });
         localStorage.setItem('employee', JSON.stringify(employeeData));
@@ -49,9 +52,7 @@ const AdminDashboard = ({userInfo}) => {
         console.error("No employee data found in localStorage");
     }
 
-    // Fetch admin data from localStorage using "admin" key
-    let adminData = JSON.parse(localStorage.getItem('admin'));
-
+    const adminData = JSON.parse(localStorage.getItem('admin'));
     if (adminData) {
         // Ensure the tasks array exists in adminData
         if (!adminData.tasks) {
@@ -60,9 +61,7 @@ const AdminDashboard = ({userInfo}) => {
         adminData.tasks.push(newTask); // Add the new task to adminData
     } else {
         // If no adminData exists, initialize it with the new task
-        adminData = {
-            tasks: [newTask],
-        };
+        console.error("No admin data found in localStorage");
     }
 
     // Save the updated admin data back to localStorage with "admin" key
@@ -74,14 +73,36 @@ const AdminDashboard = ({userInfo}) => {
     settaskDescription('');
     settaskCategory('');
     setassignTo('')
-};
-
+  };
   
+  const handleDeleteTask = (taskId) => {
+    // Fetch the admin and employee data from localStorage
+    const adminData = JSON.parse(localStorage.getItem('admin'));
+    const employeeData = JSON.parse(localStorage.getItem('employee'))
+    // Find the admin and filter out the task with the given taskId
+    const updatedAdminData = adminData.map((admin) => {
+      admin.tasks = admin.tasks.filter((task) => task.taskId !== taskId);
+      return admin;
+    });
+
+    const updatedEmployeeData = employeeData.map((employee) => {
+      employee.tasks = employee.tasks.filter((task) => task.taskId !== taskId);
+      return employee;
+    });
+
+    // Update localStorage with the new admin data
+    localStorage.setItem('admin', JSON.stringify(updatedAdminData));
+    localStorage.setItem('admin', JSON.stringify(updatedEmployeeData));
+
+
+    window.location.reload(); //reloads the page
+
+  };
 
   const handleLogout = () => {
     localStorage.setItem('loggedInUser', '');
     window.location.reload();
-};
+  };
 
   return (
     <div className='bg-[#1C1C1C] h-auto p-10'>
@@ -173,56 +194,27 @@ const AdminDashboard = ({userInfo}) => {
       <h2 className='text-2xl text-white text-center font-semibold mt-10'>Tasks Created</h2>
         {/* Task List */}   
         <div className='grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-5 mt-10'>
-           
-            <div className='flex-shrink-0 h-full bg-yellow-400 rounded-lg px-8 py-4'>
-                <div className='flex items-center justify-between'>
-                    <p className='px-2 py-1 bg-red-500 text-white rounded-lg text-center'>High</p>
-                    <p className='font-semibold'>18 Oct 2024</p>
-                </div>
-                <div className='mt-3'>
-                    <h2 className='text-xl font-semibold'>Task 1</h2>
-                    <h3 className='text-sm'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsa quos ut perferendis reiciendis natus hic eos cum quidem non tempora.</h3>
-                </div>
-                <button className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>Delete</button>
-            </div>
-            <div className='flex-shrink-0 h-full bg-yellow-400 rounded-lg px-8 py-4'>
-                <div className='flex items-center justify-between'>
-                    <p className='px-2 py-1 bg-red-500 text-white rounded-lg text-center'>High</p>
-                    <p className='font-semibold'>18 Oct 2024</p>
-                </div>
-                <div className='mt-3'>
-                    <h2 className='text-xl font-semibold'>Task 1</h2>
-                    <h3 className='text-sm'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsa quos ut perferendis reiciendis natus hic eos cum quidem non tempora.</h3>
-                </div>
-                <button className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>Delete</button>
-            </div>
-            <div className='flex-shrink-0 h-full bg-yellow-400 rounded-lg px-8 py-4'>
-                <div className='flex items-center justify-between'>
-                    <p className='px-2 py-1 bg-red-500 text-white rounded-lg text-center'>High</p>
-                    <p className='font-semibold'>18 Oct 2024</p>
-                </div>
-                <div className='mt-3'>
-                    <h2 className='text-xl font-semibold'>Task 1</h2>
-                    <h3 className='text-sm'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsa quos ut perferendis reiciendis natus hic eos cum quidem non tempora.</h3>
-                </div>
-                <button className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>Delete</button>
-            </div>
-            <div className='flex-shrink-0 h-full bg-yellow-400 rounded-lg px-8 py-4'>
-                <div className='flex items-center justify-between'>
-                    <p className='px-2 py-1 bg-red-500 text-white rounded-lg text-center'>High</p>
-                    <p className='font-semibold'>18 Oct 2024</p>
-                </div>
-                <div className='mt-3'>
-                    <h2 className='text-xl font-semibold'>Task 1</h2>
-                    <h3 className='text-sm'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsa quos ut perferendis reiciendis natus hic eos cum quidem non tempora.</h3>
-                </div>
-                <button className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>Delete</button>
-            </div>
-            
-            
-            
-        
+            {authData && authData.adminData && authData.adminData[0].tasks ? (
+                authData.adminData[0].tasks.map((task, index) => (
+                    <div key={index} className='flex-shrink-0 h-full bg-yellow-400 rounded-lg px-8 py-4'>
+                        <div className='flex items-center justify-between'>
+                            <p className='px-2 py-1 bg-red-500 text-white rounded-lg text-center'>{task.taskCategory}</p>
+                            <p className='font-semibold'>{task.taskDate || '18 Oct 2024'}</p>
+                        </div>
+                        <div className='mt-3'>
+                            <h2 className='text-xl font-semibold'>{task.taskTitle}</h2>
+                            <h3 className='text-sm'>{task.taskDescription}</h3>
+                        </div>
+                        <button onClick={() => handleDeleteTask(task.taskId)} className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>Delete</button>
+                    </div>
+                  
+                ))
+            ) : (
+                <p className='text-white text-center col-span-full'>No tasks available</p>
+            )}
         </div>
+
+
 
 
         {/* Employees Data */}
