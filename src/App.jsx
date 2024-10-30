@@ -14,6 +14,7 @@ const App = () => {
   const authData = useContext(AuthContext);
 
 
+
   useEffect(() => {
     const storedUser = localStorage.getItem('loggedInUser');
     if (storedUser) {
@@ -42,7 +43,7 @@ const App = () => {
 
   const handleSignUp = (firstName, email, password) => {
     const newEmployee = {
-      randomId: Math.floor(Math.random() * 1000000),
+      employeeId: Math.floor(Math.random() * 1000000),
       firstName,
       email,
       password,
