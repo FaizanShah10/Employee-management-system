@@ -5,7 +5,7 @@ import { setLocalStorage } from '../../utils/LocalStorage';
 const AdminDashboard = ({userInfo}) => {
 
   const authData = useContext(AuthContext)
-  // console.log(authData?.adminData)
+  // console.log(authData)
 
 
 
@@ -44,7 +44,7 @@ const AdminDashboard = ({userInfo}) => {
                     employee.tasks = []; // Initialize tasks array if it doesn't exist
                 }
                 employee.tasks.push(newTask);
-                employee.CountTask.newCountTask = employee.CountTask.newCountTask+1
+                employee.CountTask.newTaskCount = employee.CountTask.newTaskCount+1
             }
         });
         localStorage.setItem('employee', JSON.stringify(employeeData));

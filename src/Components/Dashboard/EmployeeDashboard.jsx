@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 export const EmployeeDashboard = ({ userInfo }) => {
     const [selectedTaskType, setSelectedTaskType] = useState('new');
     const [updateUserInfo, setUpdateUserInfo] = useState(userInfo);
+    console.log(updateUserInfo)
 
     useEffect(() => {
         const employeeData = JSON.parse(localStorage.getItem('employee'));
