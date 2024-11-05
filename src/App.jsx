@@ -1,79 +1,101 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './Components/Auth/Login';
 import Signup from './Components/Auth/Signup';
-import { EmployeeDashboard } from './Components/Dashboard/EmployeeDashboard';
+import EmployeeDashboard from './Components/Dashboard/EmployeeDashboard';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import { AuthContext } from './Components/Context/AuthProvider';
-import { setLocalStorage } from './utils/LocalStorage';
-
+import { auth, db } from './firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [loggedInUserInfo, setLoggedInUserInfo] = useState(null);
-  const authData = useContext(AuthContext);
-
-
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('loggedInUser');
-    if (storedUser) {
-      const userInfo = JSON.parse(storedUser);
-      setUser(userInfo.role);
-      setLoggedInUserInfo(userInfo);
-    }
-  }, [authData]);
-
-  const handleLogin = (email, password) => {
-    if (authData && authData.adminData.find(admin => admin.email === email && admin.password === password)) {
-      const adminInfo = authData.adminData.find(admin => admin.email === email);
-      setUser('admin');
-      setLoggedInUserInfo(adminInfo);
-      localStorage.setItem('loggedInUser', JSON.stringify({ ...adminInfo, role: 'admin' }));
-    } else if (authData && authData.employeeData.find(employee => employee.email === email && employee.password === password)) {
-      const employeeInfo = authData.employeeData.find(employee => employee.email === email);
-      setUser('employee');
-      setLoggedInUserInfo(employeeInfo);
-      localStorage.setItem('loggedInUser', JSON.stringify({ ...employeeInfo, role: 'employee' }));
-    } else {
-      alert('Invalid Credentials');
-    }
-  };
-
-
-  const handleSignUp = (firstName, email, password) => {
-    const newEmployee = {
-      employeeId: Math.floor(Math.random() * 1000000),
-      firstName,
-      email,
-      password,
-      tasks: [],
-      CountTask: {
-        newTaskCount: 0,
-        activeTaskCount: 0,
-        completedTaskCount: 0,
-        failedTaskCount: 0
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
+        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+        if (employeeDoc.exists()) {
+          const employeeData = employeeDoc.data();
+          setUser(employeeData.role);
+          setLoggedInUserInfo({ uid: user.uid, ...employeeData });
+        } else if (adminDoc.exists()) {
+          const adminData = adminDoc.data();
+          setUser(adminData.role);
+          setLoggedInUserInfo({ uid: user.uid, ...adminData });
+        } else {
+          alert("No user found!");
+        }
+      } else {
+        setUser(null);
+        setLoggedInUserInfo(null);
       }
-    };
+    });
+    return unsubscribe;
+  }, []);
 
-    const existingEmployees = JSON.parse(localStorage.getItem('employee'));
-    const updatedEmployees = [...existingEmployees, newEmployee];
-    
-    // Update localStorage with the new employee data
-    localStorage.setItem('employee', JSON.stringify(updatedEmployees));
+  const handleLogin = async (email, password) => {
+    try {
+      const employeeCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = employeeCredential.user;
 
-    // Set as logged-in employee and redirect to dashboard
-    setUser('employee');
-    setLoggedInUserInfo(newEmployee);
-    localStorage.setItem('loggedInUser', JSON.stringify({ ...newEmployee, role: 'employee' }));
+      const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+
+      if (employeeDoc.exists()) {
+        const employeeData = employeeDoc.data();
+        setUser(employeeData.role);
+        setLoggedInUserInfo({ uid: user.uid, ...employeeData });
+      } else if (adminDoc.exists()) {
+        const adminData = adminDoc.data();
+        setUser(adminData.role);
+        setLoggedInUserInfo({ uid: user.uid, ...adminData });
+      } else {
+        console.error("No user found");
+        alert("No User Found!");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Invalid Credentials");
+    }
   };
 
+  const handleSignUp = async (firstName, email, password, isAdmin = false) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userData = {
+        firstName,
+        email,
+        role: isAdmin ? 'admin' : 'employee',
+        tasks: [],
+        CountTask: {
+          newTaskCount: 0,
+          activeTaskCount: 0,
+          completedTaskCount: 0,
+          failedTaskCount: 0
+        }
+      };
+
+      await setDoc(doc(db, isAdmin ? 'admins' : 'employees', user.uid), userData);
+
+      setUser(isAdmin ? 'admin' : 'employee');
+      setLoggedInUserInfo({ uid: user.uid, ...userData });
+    } catch (error) {
+      console.error("Signup Error:", error);
+      alert(error.message);
+    }
+  };
 
   return (
-    <Router>
+    
       <Routes>
         <Route path="/login" element={<Login handleLogin={handleLogin} />} />
-        <Route path="/signup" element={<Signup handleSignUp={handleSignUp}/>} />
+        <Route path="/signup" element={<Signup handleSignUp={handleSignUp} />} />
         <Route
           path="/dashboard"
           element={
@@ -86,10 +108,9 @@ const App = () => {
             )
           }
         />
-        <Route path="*" element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" />} />
-
+        <Route path="*" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
       </Routes>
-    </Router>
+    
   );
 };
 
