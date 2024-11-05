@@ -1,18 +1,84 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { getLocalStorage } from '../../utils/LocalStorage';
+import { auth, db } from '../../firebase'; // Adjust the path as necessary
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [userData, setUserData] = useState(null);  
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
-    const { adminData, employeeData } = getLocalStorage();  
-    setUserData({ adminData, employeeData });  
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
+        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+        if (employeeDoc.exists()) {
+          setUserInfo({ uid: user.uid, ...employeeDoc.data() });
+        } else if (adminDoc.exists()) {
+          setUserInfo({ uid: user.uid, ...adminDoc.data() });
+        } else {
+          alert("No user found!");
+        }
+      } else {
+        setUserInfo(null);
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
   }, []);
 
+  const handleLogin = async (email, password) => {
+    try {
+      const employeeCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = employeeCredential.user;
+
+      const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+
+      if (employeeDoc.exists()) {
+        setUserInfo({ uid: user.uid, ...employeeDoc.data() });
+      } else if (adminDoc.exists()) {
+        setUserInfo({ uid: user.uid, ...adminDoc.data() });
+      } else {
+        alert("No User Found!");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Invalid Credentials");
+    }
+  };
+
+  const handleSignUp = async (firstName, email, password, isAdmin = false) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userData = {
+        firstName,
+        email,
+        role: isAdmin ? 'admin' : 'employee',
+        tasks: [],
+        CountTask: {
+          newTaskCount: 0,
+          activeTaskCount: 0,
+          completedTaskCount: 0,
+          failedTaskCount: 0
+        }
+      };
+
+      await setDoc(doc(db, isAdmin ? 'admins' : 'employees', user.uid), userData);
+      setUserInfo({ uid: user.uid, ...userData });
+    } catch (error) {
+      console.error("Signup Error:", error);
+      alert(error.message);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={userData}>
+    <AuthContext.Provider value={{ userInfo, loading, handleLogin, handleSignUp }}>
       {children}
     </AuthContext.Provider>
   );

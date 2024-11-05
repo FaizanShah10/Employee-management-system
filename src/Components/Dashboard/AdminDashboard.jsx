@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../Context/AuthProvider';
 import { auth, db } from '../../firebase';
-import {query, where, collection, doc, addDoc,getDocs, updateDoc, arrayUnion, increment, writeBatch } from 'firebase/firestore';
+import { query, where, collection, doc, addDoc, getDocs, updateDoc, arrayUnion, increment, writeBatch, getDoc } from 'firebase/firestore';
 
 const AdminDashboard = ({ userInfo }) => {
-  const authData = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState(null); // State to track which task is being deleted
 
   const [taskTitle, settaskTitle] = useState('');
   const [taskDescription, settaskDescription] = useState('');
@@ -14,10 +15,8 @@ const AdminDashboard = ({ userInfo }) => {
   const [tasks, setTasks] = useState([]);
   const [employees, setEmployees] = useState([]);
 
-
   // Fetch employee data from Firestore 
   useEffect(() => {
-    
     const fetchEmployees = async () => {
       try {
         const employeeSnapshot = await getDocs(collection(db, 'employees'));
@@ -36,7 +35,6 @@ const AdminDashboard = ({ userInfo }) => {
 
   // Fetch tasks from Firestore 
   useEffect(() => {
-    
     const fetchTasks = async () => {
       try {
         const tasksSnapshot = await getDocs(collection(db, 'tasks'));
@@ -59,7 +57,8 @@ const AdminDashboard = ({ userInfo }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    setLoading(true);
+
     const taskId = generateRandomId();
     const newTask = {
       taskId,
@@ -70,95 +69,111 @@ const AdminDashboard = ({ userInfo }) => {
       taskCategory,
       status: 'new'
     };
-  
+
     try {
       const batch = writeBatch(db);
-  
+
       // Step 1: Add task to the "tasks" collection
       const tasksCollectionRef = collection(db, 'tasks');
       await addDoc(tasksCollectionRef, newTask);
-  
+
       // Step 2: Query to find the employee document by firstName
       const employeeQuery = query(collection(db, 'employees'), where('firstName', '==', assignTo));
       const employeeSnapshot = await getDocs(employeeQuery);
-  
+
       if (employeeSnapshot.empty) {
         throw new Error(`No employee found with firstName: ${assignTo}`);
       }
-  
+
       const employeeDoc = employeeSnapshot.docs[0]; // Assuming first match is correct
       const employeeRef = doc(db, 'employees', employeeDoc.id);
-  
+
       // Step 3: Update the tasks array in the admin document
       const adminRef = doc(db, 'admins', userInfo.uid);
       batch.update(adminRef, {
         tasks: arrayUnion(newTask)
       });
-  
+
       // Step 4: Update the tasks and CountTask for the assigned employee
       batch.update(employeeRef, {
         tasks: arrayUnion(newTask),
         'CountTask.newTaskCount': increment(1)
       });
-  
+
       // Commit the batch
       await batch.commit();
-  
+
       // Clear form inputs
       settaskTitle('');
       settaskDate('');
       settaskDescription('');
       settaskCategory('');
       setassignTo('');
+
+      setLoading(false);
     } catch (error) {
       console.error("Error creating task:", error);
       alert("Failed to create the task. " + error.message);
+      setLoading(false);
     }
   };
 
   const handleDeleteTask = async (taskId) => {
+    console.log(taskId);
+    setDeletingTaskId(taskId);
     try {
       // Fetch the admin and employee references
       const adminRef = doc(db, 'admins', userInfo.uid);
       const employeesRef = collection(db, 'employees');
-
+  
       // Get the current admin data
       const adminDoc = await getDoc(adminRef);
-
+  
       if (adminDoc.exists()) {
         const batch = writeBatch(db);
-
-        // Update admin's tasks array by filtering out the task to be deleted
+  
+        // Step 1: Update admin's tasks array by filtering out the task to be deleted
+        const updatedAdminTasks = adminDoc.data().tasks.filter((task) => task.taskId !== taskId);
         batch.update(adminRef, {
-          tasks: adminDoc.data().tasks.filter((task) => task.taskId !== taskId)
+          tasks: updatedAdminTasks
         });
-
-        // Remove task from employee's task array and decrement CountTask
+  
+        // Step 2: Remove task from employee's task array and decrement CountTask
         const assignedEmployee = adminDoc.data().tasks.find((task) => task.taskId === taskId)?.assignTo;
         if (assignedEmployee) {
-          const employeeRef = doc(db, 'employees', assignedEmployee);
-          const employeeDoc = await getDoc(employeeRef);
-
-          if (employeeDoc.exists()) {
-            const updatedTasks = employeeDoc.data().tasks.filter((task) => task.taskId !== taskId);
+          const employeeQuery = query(collection(db, 'employees'), where('firstName', '==', assignedEmployee));
+          const employeeSnapshot = await getDocs(employeeQuery);
+          if (!employeeSnapshot.empty) {
+            const employeeDoc = employeeSnapshot.docs[0];
+            const employeeRef = doc(db, 'employees', employeeDoc.id);
+  
+            const updatedEmployeeTasks = employeeDoc.data().tasks.filter((task) => task.taskId !== taskId);
             batch.update(employeeRef, {
-              tasks: updatedTasks,
+              tasks: updatedEmployeeTasks,
               'CountTask.newTaskCount': increment(-1) // Decrement task count
             });
           }
         }
-
+  
+        // Step 3: Delete the task from the 'tasks' collection
+        const taskDocRef = doc(db, 'tasks', taskId); // Use taskId to reference the task
+        batch.delete(taskDocRef); // Remove the task from the collection
+  
+        // Commit the batch
         await batch.commit();
+        setDeletingTaskId(null); // Reset the deleting task ID
         window.location.reload(); // Reload the page to update UI
       }
     } catch (error) {
       console.error("Error deleting task:", error);
       alert("Failed to delete the task.");
+      setDeletingTaskId(null); // Reset the deleting task ID
     }
   };
+  
 
   const handleLogout = () => {
-    auth.signOut()
+    auth.signOut();
   };
 
   return (
@@ -251,9 +266,13 @@ const AdminDashboard = ({ userInfo }) => {
                 <h2 className='text-xl font-semibold'>{task.taskTitle}</h2>
                 <h3 className='text-sm'>{task.taskDescription}</h3>
               </div>
-              <button onClick={() => handleDeleteTask(task.taskId)} className='px-3 py-1 bg-red-600 text-white rounded-md mt-4'>
-                Delete
-              </button>
+              <button
+                      onClick={() => handleDeleteTask(task.taskId)}
+                      className='bg-red-600 text-white px-4 py-1 rounded-md mt-2'
+                      disabled={deletingTaskId === task.taskId} // Disable button if this task is being deleted
+                    >
+                      {deletingTaskId === task.taskId ? 'Deleting...' : 'Delete'}
+                    </button>
             </div>
           ))
         ) : (
