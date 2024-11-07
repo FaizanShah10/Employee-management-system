@@ -124,7 +124,6 @@ const AdminDashboard = ({ userInfo }) => {
     try {
       // Fetch the admin and employee references
       const adminRef = doc(db, 'admins', userInfo.uid);
-      const employeesRef = collection(db, 'employees');
   
       // Get the current admin data
       const adminDoc = await getDoc(adminRef);
@@ -155,9 +154,15 @@ const AdminDashboard = ({ userInfo }) => {
           }
         }
   
-        // Step 3: Delete the task from the 'tasks' collection
-        const taskDocRef = doc(db, 'tasks', taskId); // Use taskId to reference the task
-        batch.delete(taskDocRef); // Remove the task from the collection
+        // Step 3: Find the correct document ID in the 'tasks' collection
+        const taskQuery = query(collection(db, 'tasks'), where("taskId", "==", taskId));
+        const taskSnapshot = await getDocs(taskQuery);
+        if (!taskSnapshot.empty) {
+          const taskDocRef = taskSnapshot.docs[0].ref; // Get the document reference
+          batch.delete(taskDocRef); // Remove the task from the collection
+        } else {
+          console.error("Task not found in tasks collection.");
+        }
   
         // Commit the batch
         await batch.commit();
@@ -170,6 +175,7 @@ const AdminDashboard = ({ userInfo }) => {
       setDeletingTaskId(null); // Reset the deleting task ID
     }
   };
+  
   
 
   const handleLogout = () => {
@@ -244,7 +250,7 @@ const AdminDashboard = ({ userInfo }) => {
             </div>
 
             <div className='flex mt-5'>
-              <button className='bg-green-600 text-white px-6 py-2 rounded-full font-semibold'>
+              <button className='bg-green-600 hover:bg-green-700 transition-all text-white px-6 py-2 rounded-full font-semibold'>
                 Create New Task
               </button>
             </div>
