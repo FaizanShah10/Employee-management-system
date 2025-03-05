@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthContext } from '../Context/AuthProvider'; // Adjust the import path
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 
 
@@ -77,7 +78,12 @@ const Login = ({ handleLogin }) => {
         {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
       </form>
       <div className='mt-4 text-white'>
-        <p>Dont have an account? <a href="/signup" className='text-emerald-600 hover:underline'>Signup</a></p>
+        <p>
+          Dont have an account? 
+          <Link to='/signup'><span className='text-emerald-600 hover:underline ml-2'>
+            Signup</span>
+          </Link>
+        </p>
       </div>
 
     </div>

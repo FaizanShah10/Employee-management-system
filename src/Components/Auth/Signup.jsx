@@ -87,7 +87,7 @@ const Signup = ({ handleSignUp }) => {
         <p>
           Already have an account? 
           <span 
-            className='text-emerald-600 hover:underline cursor-pointer' 
+            className='text-emerald-600 hover:underline cursor-pointer ml-2' 
             onClick={() => navigate('/login')} // Use navigate to go to the Login component
           >
             Login

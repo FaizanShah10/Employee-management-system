@@ -11,7 +11,7 @@ const App = () => {
 
   if (loading) {
     return <div className='flex justify-center items-center w-screen h-screen bg-zinc-800'>
-          <div  role="status">
+            <div  role="status">
               <svg
                 aria-hidden="true"
                 className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
@@ -30,7 +30,7 @@ const App = () => {
               </svg>
               <span className="sr-only">Loading...</span>
             </div>
-    </div>;
+          </div>;
   }
 
   return (
