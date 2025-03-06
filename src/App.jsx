@@ -41,12 +41,12 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            userInfo?.role === 'admin' ? (
-              <AdminDashboard userInfo={userInfo} />
-            ) : userInfo?.role === 'employee' ? (
-              <EmployeeDashboard userInfo={userInfo} />
-            ) : (
+            userInfo === null ? (
               <Navigate to="/login" />
+            ) : userInfo.role === 'admin' ? (
+              <AdminDashboard userInfo={userInfo} />
+            ) : (
+              <EmployeeDashboard userInfo={userInfo} />
             )
           }
         />

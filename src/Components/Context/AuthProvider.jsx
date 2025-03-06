@@ -13,22 +13,31 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
-        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-        if (employeeDoc.exists()) {
-          setUserInfo({ uid: user.uid, ...employeeDoc.data() });
-        } else if (adminDoc.exists()) {
-          setUserInfo({ uid: user.uid, ...adminDoc.data() });
-        } else {
-          alert("No user found!");
+        setLoading(true); // Set loading state while fetching data
+        try {
+          const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
+          const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+  
+          if (employeeDoc.exists()) {
+            setUserInfo({ uid: user.uid, ...employeeDoc.data() });
+          } else if (adminDoc.exists()) {
+            setUserInfo({ uid: user.uid, ...adminDoc.data() });
+          } else {
+            console.warn("No user found in Firestore, logging out...");
+            setUserInfo(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
       } else {
         setUserInfo(null);
       }
       setLoading(false);
     });
+  
     return unsubscribe;
   }, []);
+  
 
   const handleLogin = async (email, password) => {
     try {
@@ -45,6 +54,9 @@ const AuthProvider = ({ children }) => {
       } else {
         alert("No User Found!");
       }
+
+      // Debug
+      console.log("User LoggedIn Succesdfully", user)
     } catch (error) {
       console.error("Login Error:", error);
       alert("Invalid Credentials");
@@ -71,6 +83,7 @@ const AuthProvider = ({ children }) => {
 
       await setDoc(doc(db, isAdmin ? 'admins' : 'employees', user.uid), userData);
       setUserInfo({ uid: user.uid, ...userData });
+      console.log("User Created Successfully", user)
     } catch (error) {
       console.error("Signup Error:", error);
       alert(error.message);
